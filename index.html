@@ -370,7 +370,7 @@ document.querySelectorAll(".edit-row").forEach(btn=>{
         c.classList.add("editing");
       });
       btn.dataset.editing="true";
-      btn.textContent="💾 Lưu";
+      btn.textContent="Lưu";
       btn.classList.add("save-row");
 
       const cancel=document.createElement("button");
@@ -387,7 +387,7 @@ document.querySelectorAll(".edit-row").forEach(btn=>{
           c.classList.remove("editing");
         });
         btn.dataset.editing="false";
-        btn.textContent="✏️ Sửa";
+        btn.textContent="Sửa";
         btn.classList.remove("save-row");
         cancel.remove();
       };
@@ -399,7 +399,7 @@ document.querySelectorAll(".edit-row").forEach(btn=>{
         c.classList.remove("editing");
       });
       btn.dataset.editing="false";
-      btn.textContent="✏️ Sửa";
+      btn.textContent="Sửa";
       btn.classList.remove("save-row");
       row.querySelector("[data-cancel]")?.remove();
       row.querySelector(".cancel-row")?.remove();
