@@ -41,7 +41,7 @@ input:disabled{background:#e2e8f0;color:#94a3b8}input[readonly]{background:#f8fa
 .status-grid{display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center}
 table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:11px;border-bottom:1px solid var(--border);text-align:left}th{background:#f8fafc;color:#475569}tr:hover td{background:#f8fbff}
 .badge{padding:4px 8px;border-radius:20px;font-size:11px;font-weight:700}.active-b{background:#dcfce7;color:#15803d}.inactive-b{background:#fee2e2;color:#b91c1c}
-.table-tools{display:flex;justify-content:space-between;gap:10px;margin-bottom:12px}.table-tools input{max-width:240px}
+.table-tools{display:flex;justify-content:space-between;gap:10px;margin-bottom:12px}.table-tools input{max-width:240px}.table-actions{display:flex;gap:6px;flex-wrap:wrap}.edit-cell{cursor:text;outline:none;border-radius:5px}.edit-cell:focus{box-shadow:0 0 0 2px #93c5fd;background:#eff6ff}.save-row{background:#16a34a}.cancel-row{background:#64748b}
 .file-box{border:2px dashed #93c5fd;border-radius:10px;padding:30px;text-align:center;background:#eff6ff;cursor:pointer}.file-box:hover{background:#dbeafe}
 .file-name{margin-top:12px;padding:10px;background:#f8fafc;border-radius:7px;font-size:13px}
 .progress{height:8px;background:#e2e8f0;border-radius:20px;overflow:hidden;margin-top:10px}.progress div{height:100%;width:0;background:#16a34a;transition:.4s}
@@ -198,13 +198,33 @@ footer{text-align:center;color:#64748b;font-size:12px;padding:25px}
     </div>
     <div style="overflow:auto">
     <table id="dataTable">
-      <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Status</th></tr></thead>
+      <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Action</th></tr></thead>
       <tbody>
-        <tr><td>1</td><td>Nguyen Van A</td><td>a@example.com</td><td>Admin</td><td><span class="badge active-b">Active</span></td></tr>
-        <tr><td>2</td><td>Tran Thi B</td><td>b@example.com</td><td>User</td><td><span class="badge active-b">Active</span></td></tr>
-        <tr><td>3</td><td>Le Quoc C</td><td>c@example.com</td><td>User</td><td><span class="badge inactive-b">Inactive</span></td></tr>
-        <tr><td>4</td><td>Pham Minh D</td><td>d@example.com</td><td>Manager</td><td><span class="badge active-b">Active</span></td></tr>
-        <tr><td>5</td><td>Hoang Thi E</td><td>e@example.com</td><td>User</td><td><span class="badge active-b">Active</span></td></tr>
+        <tr>
+          <td>1</td><td class="edit-cell" data-editable>Nguyen Van A</td><td class="edit-cell" data-editable>a@example.com</td>
+          <td class="edit-cell" data-editable>Admin</td><td><span class="badge active-b">Active</span></td>
+          <td><div class="table-actions"><button class="edit-row">✏️ Sửa</button></div></td>
+        </tr>
+        <tr>
+          <td>2</td><td class="edit-cell" data-editable>Tran Thi B</td><td class="edit-cell" data-editable>b@example.com</td>
+          <td class="edit-cell" data-editable>User</td><td><span class="badge active-b">Active</span></td>
+          <td><div class="table-actions"><button class="edit-row">✏️ Sửa</button></div></td>
+        </tr>
+        <tr>
+          <td>3</td><td class="edit-cell" data-editable>Le Quoc C</td><td class="edit-cell" data-editable>c@example.com</td>
+          <td class="edit-cell" data-editable>User</td><td><span class="badge inactive-b">Inactive</span></td>
+          <td><div class="table-actions"><button class="edit-row">✏️ Sửa</button></div></td>
+        </tr>
+        <tr>
+          <td>4</td><td class="edit-cell" data-editable>Pham Minh D</td><td class="edit-cell" data-editable>d@example.com</td>
+          <td class="edit-cell" data-editable>Manager</td><td><span class="badge active-b">Active</span></td>
+          <td><div class="table-actions"><button class="edit-row">✏️ Sửa</button></div></td>
+        </tr>
+        <tr>
+          <td>5</td><td class="edit-cell" data-editable>Hoang Thi E</td><td class="edit-cell" data-editable>e@example.com</td>
+          <td class="edit-cell" data-editable>User</td><td><span class="badge active-b">Active</span></td>
+          <td><div class="table-actions"><button class="edit-row">✏️ Sửa</button></div></td>
+        </tr>
       </tbody>
     </table>
     </div>
@@ -212,7 +232,7 @@ footer{text-align:center;color:#64748b;font-size:12px;padding:25px}
       • Đếm số dòng: <code>tbody tr</code><br>
       • Lấy text 1 ô: ví dụ row 2 / column Name<br>
       • Duyệt toàn bộ bảng<br>
-      • Tìm một dòng theo giá trị
+      • Tìm một dòng theo giá trị<br>• Click <b>Sửa</b> để chỉnh sửa Name / Email / Role trực tiếp trong table<br>• Click <b>Lưu</b> để lưu hoặc <b>Hủy</b> để khôi phục
     </div>
   </div>
 </section>
@@ -335,6 +355,58 @@ function updateTable(){
   $("rowCount").textContent=count;
 }
 $("tableSearch").oninput=updateTable;
+
+/* Editable Data Table */
+document.querySelectorAll(".edit-row").forEach(btn=>{
+  btn.onclick=()=>{
+    const row=btn.closest("tr");
+    const cells=[...row.querySelectorAll("[data-editable]")];
+    const editing=btn.dataset.editing==="true";
+
+    if(!editing){
+      row.dataset.original=JSON.stringify(cells.map(c=>c.textContent));
+      cells.forEach(c=>{
+        c.contentEditable="true";
+        c.classList.add("editing");
+      });
+      btn.dataset.editing="true";
+      btn.textContent="💾 Lưu";
+      btn.classList.add("save-row");
+
+      const cancel=document.createElement("button");
+      cancel.className="cancel-row";
+      cancel.textContent="↩ Hủy";
+      cancel.dataset.cancel="true";
+      btn.parentElement.appendChild(cancel);
+
+      cancel.onclick=()=>{
+        const original=JSON.parse(row.dataset.original||"[]");
+        cells.forEach((c,i)=>{
+          c.textContent=original[i] ?? "";
+          c.contentEditable="false";
+          c.classList.remove("editing");
+        });
+        btn.dataset.editing="false";
+        btn.textContent="✏️ Sửa";
+        btn.classList.remove("save-row");
+        cancel.remove();
+      };
+
+      cells[0]?.focus();
+    }else{
+      cells.forEach(c=>{
+        c.contentEditable="false";
+        c.classList.remove("editing");
+      });
+      btn.dataset.editing="false";
+      btn.textContent="✏️ Sửa";
+      btn.classList.remove("save-row");
+      row.querySelector("[data-cancel]")?.remove();
+      row.querySelector(".cancel-row")?.remove();
+      row.dataset.original="";
+    }
+  };
+});
 
 /* Upload */
 $("fileInput").onchange=()=>{
