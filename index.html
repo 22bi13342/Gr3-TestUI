@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Web UI Testing Playground</title>
+<style>
+*{box-sizing:border-box}
+:root{
+  --primary:#2563eb;--primary2:#1d4ed8;--bg:#f4f7fb;--card:#fff;
+  --text:#172033;--muted:#64748b;--border:#dbe3ef;--success:#16a34a;
+  --danger:#dc2626;--warning:#d97706;--purple:#7c3aed;
+}
+body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+header{height:72px;background:#173b69;color:#fff;display:flex;align-items:center;padding:0 28px;position:sticky;top:0;z-index:20}
+.logo{font-size:25px;margin-right:14px}.header-title{font-size:20px;font-weight:700}.header-sub{font-size:12px;color:#cbd5e1;margin-top:3px}
+.app{display:flex;min-height:calc(100vh - 72px)}
+.sidebar{width:235px;background:#fff;border-right:1px solid var(--border);padding:20px 14px;position:sticky;top:72px;height:calc(100vh - 72px);overflow:auto}
+.nav-title{font-size:13px;font-weight:800;color:#334155;margin:12px 10px 8px;text-transform:uppercase}
+.nav a{display:block;padding:10px 12px;margin:3px 0;border-radius:8px;color:#475569;text-decoration:none;font-size:14px}
+.nav a:hover,.nav a.active{background:#e8f0ff;color:#1d4ed8;font-weight:600}
+main{flex:1;padding:26px;max-width:1500px;margin:auto;width:100%}
+.grid{display:grid;gap:18px}.grid-2{grid-template-columns:1fr 1fr}.grid-3{grid-template-columns:1.5fr 1fr 1fr}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:visible;margin-bottom:18px;box-shadow:0 2px 8px rgba(15,23,42,.04)}
+.card-head{padding:14px 18px;border-bottom:1px solid var(--border);font-size:17px;font-weight:700;display:flex;align-items:center;gap:10px}
+.num{width:30px;height:30px;border-radius:50%;background:var(--primary);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:800}
+.card-body{padding:18px}.demo-note{background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:14px;font-size:13px;color:#475569;line-height:1.65}
+.demo-note b{color:#1e40af}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+button,.btn{border:0;border-radius:7px;padding:9px 14px;font-weight:600;cursor:pointer;background:var(--primary);color:white}
+button:hover{background:var(--primary2)}button.success{background:var(--success)}button.warning{background:var(--warning)}button.danger{background:var(--danger)}
+button.secondary{background:#e2e8f0;color:#334155}.status{display:inline-block;padding:7px 11px;border-radius:7px;background:#ecfdf5;color:#15803d;font-size:13px;font-weight:600}
+pre.output{background:#0f172a;color:#dbeafe;border-radius:8px;padding:12px;min-height:45px;white-space:pre-wrap;font-size:13px}
+label{font-size:14px}input[type=text],input[type=number],select{height:40px;border:1px solid #cbd5e1;border-radius:7px;padding:0 11px;width:100%;background:white;color:#172033}
+input:disabled{background:#e2e8f0;color:#94a3b8}input[readonly]{background:#f8fafc}
+.check-row,.radio-row{display:flex;gap:18px;flex-wrap:wrap;margin:10px 0}.check-row label,.radio-row label{display:flex;gap:7px;align-items:center}
+.custom-wrap{position:relative;width:230px}.custom-select{height:40px;border:1px solid #cbd5e1;border-radius:7px;padding:0 11px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;background:#fff}
+.custom-options{display:none;position:absolute;top:44px;left:0;right:0;background:#fff;border:1px solid #cbd5e1;border-radius:7px;box-shadow:0 10px 20px rgba(15,23,42,.12);z-index:30;overflow:hidden}
+.custom-options.open{display:block}.custom-option{padding:10px 12px;cursor:pointer}.custom-option:hover{background:#eff6ff;color:#1d4ed8}
+.hidden-el{display:none!important}.visible-box{padding:9px 12px;border-radius:7px;background:#dcfce7;color:#166534;display:inline-block}
+.disabled-box{padding:9px 12px;border-radius:7px;background:#e2e8f0;color:#94a3b8;display:inline-block}
+.status-grid{display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:11px;border-bottom:1px solid var(--border);text-align:left}th{background:#f8fafc;color:#475569}tr:hover td{background:#f8fbff}
+.badge{padding:4px 8px;border-radius:20px;font-size:11px;font-weight:700}.active-b{background:#dcfce7;color:#15803d}.inactive-b{background:#fee2e2;color:#b91c1c}
+.table-tools{display:flex;justify-content:space-between;gap:10px;margin-bottom:12px}.table-tools input{max-width:240px}
+.file-box{border:2px dashed #93c5fd;border-radius:10px;padding:30px;text-align:center;background:#eff6ff;cursor:pointer}.file-box:hover{background:#dbeafe}
+.file-name{margin-top:12px;padding:10px;background:#f8fafc;border-radius:7px;font-size:13px}
+.progress{height:8px;background:#e2e8f0;border-radius:20px;overflow:hidden;margin-top:10px}.progress div{height:100%;width:0;background:#16a34a;transition:.4s}
+.tooltip-wrap{position:relative;display:inline-block}.tooltip-text{visibility:hidden;opacity:0;position:absolute;bottom:calc(100% + 9px);left:50%;transform:translateX(-50%);background:#111827;color:#fff;padding:8px 11px;border-radius:6px;font-size:12px;white-space:nowrap;transition:.2s;z-index:50}.tooltip-wrap:hover .tooltip-text{visibility:visible;opacity:1}
+.modal{display:none;position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:100;align-items:center;justify-content:center}.modal.show{display:flex}.modal-box{background:white;border-radius:12px;width:min(430px,90%);padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.25)}.modal-box h3{margin-top:0}
+footer{text-align:center;color:#64748b;font-size:12px;padding:25px}
+@media(max-width:900px){.sidebar{display:none}.grid-2,.grid-3{grid-template-columns:1fr}main{padding:15px}.status-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🖥️</div>
+  <div>
+    <div class="header-title">Web UI Testing Playground</div>
+    <div class="header-sub">Practice with Playwright & Selenium</div>
+  </div>
+</header>
+
+<div class="app">
+<aside class="sidebar">
+  <div class="nav-title">Topic 1: Working With</div>
+  <nav class="nav">
+    <a href="#alert" class="active">🔔 Alert</a>
+    <a href="#checkbox">☑ Checkbox</a>
+    <a href="#radio">◉ Radio Button</a>
+    <a href="#dropdown">▾ Dropdown</a>
+    <a href="#status">⚙ Element Status</a>
+  </nav>
+  <div class="nav-title">Topic 2: Working With</div>
+  <nav class="nav">
+    <a href="#table">▦ Data Table</a>
+    <a href="#files">⇧ Upload / Download</a>
+    <a href="#tooltip">💬 Tooltip</a>
+  </nav>
+</aside>
+
+<main>
+<section id="alert" class="card">
+  <div class="card-head"><span class="num">1</span> Alert</div>
+  <div class="card-body">
+    <div class="grid grid-3">
+      <div>
+        <div class="row">
+          <button id="alertBtn">Open Alert</button>
+          <button id="confirmBtn" class="success">Open Confirm</button>
+          <button id="promptBtn" class="warning">Open Prompt</button>
+        </div>
+      </div>
+      <div>
+        <label><b>Alert Content</b></label>
+        <pre id="alertOutput" class="output">No alert has been triggered yet.</pre>
+      </div>
+      <div class="demo-note"><b>Demo</b><br>
+        • Open Alert: OK<br>
+        • Open Confirm: OK / Cancel<br>
+        • Open Prompt: nhập text + OK / Cancel<br>
+        • Lấy nội dung alert bằng Playwright/Selenium
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="checkbox" class="card">
+  <div class="card-head"><span class="num">2</span> Checkbox</div>
+  <div class="card-body">
+    <div class="grid grid-2">
+      <div>
+        <div class="check-row">
+          <label><input id="check1" type="checkbox" checked> Option 1 (checked)</label>
+          <label><input id="check2" type="checkbox"> Option 2</label>
+          <label><input id="check3" type="checkbox"> Option 3</label>
+        </div>
+        <div class="row">
+          <button id="checkAll">Check All</button>
+          <button id="uncheckAll" class="secondary">Uncheck All</button>
+          <span class="status" id="checkStatus">Option 1 is checked</span>
+        </div>
+      </div>
+      <div class="demo-note"><b>Demo Checkbox</b><br>• Check<br>• Uncheck<br>• Kiểm tra đã tick hay chưa</div>
+    </div>
+  </div>
+</section>
+
+<section id="radio" class="card">
+  <div class="card-head"><span class="num">3</span> Radio Button</div>
+  <div class="card-body">
+    <div class="grid grid-2">
+      <div>
+        <div class="radio-row">
+          <label><input type="radio" name="gender" value="Male" checked> Male</label>
+          <label><input type="radio" name="gender" value="Female"> Female</label>
+          <label><input type="radio" name="gender" value="Other"> Other</label>
+        </div>
+        <p>Current selection: <span class="status" id="radioStatus">Male</span></p>
+      </div>
+      <div class="demo-note"><b>Demo Radio Button</b><br>• Chọn 1 trong nhiều<br>• Kiểm tra lựa chọn hiện tại</div>
+    </div>
+  </div>
+</section>
+
+<section id="dropdown" class="card">
+  <div class="card-head"><span class="num">4</span> Dropdown</div>
+  <div class="card-body">
+    <div class="grid grid-3">
+      <div>
+        <label><b>Native &lt;select&gt;</b></label>
+        <select id="nativeSelect">
+          <option value="">Select an option</option><option value="Option 1">Option 1</option>
+          <option value="Option 2">Option 2</option><option value="Option 3">Option 3</option>
+        </select>
+        <p id="nativeStatus" class="status">No selection</p>
+      </div>
+      <div>
+        <label><b>Custom dropdown (div)</b></label>
+        <div class="custom-wrap">
+          <div id="customSelect" class="custom-select">Select an option <span>⌄</span></div>
+          <div id="customOptions" class="custom-options">
+            <div class="custom-option" data-value="Option 1">Option 1</div>
+            <div class="custom-option" data-value="Option 2">Option 2</div>
+            <div class="custom-option" data-value="Option 3">Option 3</div>
+          </div>
+        </div>
+        <p id="customStatus" class="status">No selection</p>
+      </div>
+      <div class="demo-note"><b>Demo Dropdown</b><br>• Native dropdown = <code>&lt;select&gt;</code><br>• Custom dropdown = <code>&lt;div&gt;</code><br>• Playwright: select_option chỉ dùng cho select thật</div>
+    </div>
+  </div>
+</section>
+
+<section id="status" class="card">
+  <div class="card-head"><span class="num">5</span> Element Status</div>
+  <div class="card-body">
+    <div class="grid grid-2">
+      <div class="status-grid">
+        <b>Visible</b><span id="visibleElement" class="visible-box">I am visible</span>
+        <b>Hidden</b><span id="hiddenElement" class="visible-box hidden-el">I am hidden</span>
+        <b>Enabled</b><button id="enabledButton">Enabled Button</button>
+        <b>Disabled</b><button id="disabledButton" disabled>Disabled Button</button>
+        <b>Editable</b><input id="editableInput" type="text" value="You can edit me">
+        <b>Read-only</b><input id="readonlyInput" type="text" value="Read only value" readonly>
+      </div>
+      <div class="demo-note"><b>Demo Element Status</b><br>• visible<br>• hidden<br>• enabled<br>• disabled<br>• editable<br>• read-only</div>
+    </div>
+  </div>
+</section>
+
+<section id="table" class="card">
+  <div class="card-head"><span class="num">6</span> Data Table</div>
+  <div class="card-body">
+    <div class="table-tools">
+      <span>Rows: <b id="rowCount">5</b></span>
+      <input id="tableSearch" type="text" placeholder="Search name, email, role...">
+    </div>
+    <div style="overflow:auto">
+    <table id="dataTable">
+      <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Nguyen Van A</td><td>a@example.com</td><td>Admin</td><td><span class="badge active-b">Active</span></td></tr>
+        <tr><td>2</td><td>Tran Thi B</td><td>b@example.com</td><td>User</td><td><span class="badge active-b">Active</span></td></tr>
+        <tr><td>3</td><td>Le Quoc C</td><td>c@example.com</td><td>User</td><td><span class="badge inactive-b">Inactive</span></td></tr>
+        <tr><td>4</td><td>Pham Minh D</td><td>d@example.com</td><td>Manager</td><td><span class="badge active-b">Active</span></td></tr>
+        <tr><td>5</td><td>Hoang Thi E</td><td>e@example.com</td><td>User</td><td><span class="badge active-b">Active</span></td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="demo-note" style="margin-top:14px"><b>Demo Data Table</b><br>
+      • Đếm số dòng: <code>tbody tr</code><br>
+      • Lấy text 1 ô: ví dụ row 2 / column Name<br>
+      • Duyệt toàn bộ bảng<br>
+      • Tìm một dòng theo giá trị
+    </div>
+  </div>
+</section>
+
+<section id="files" class="card">
+  <div class="card-head"><span class="num">7</span> Upload / Download Files</div>
+  <div class="card-body">
+    <div class="grid grid-2">
+      <div>
+        <h4>Upload File</h4>
+        <label for="fileInput" class="file-box" id="dropZone">
+          📁<br><b>Click to select file</b><br><small>Playwright: set_input_files | Selenium: sendKeys(path)</small>
+        </label>
+        <input id="fileInput" type="file" hidden>
+        <div id="fileName" class="file-name">No file selected.</div>
+        <div class="progress"><div id="progressBar"></div></div>
+        <p id="uploadStatus" class="status">Waiting for file...</p>
+      </div>
+      <div>
+        <h4>Download File</h4>
+        <button id="downloadBtn">⬇ Download Sample File</button>
+        <div class="demo-note" style="margin-top:15px">
+          <b>Demo Download</b><br>
+          Click button để tải file <code>sample-download.txt</code>.<br>
+          Playwright có thể dùng <code>page.waitForEvent('download')</code>.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="tooltip" class="card">
+  <div class="card-head"><span class="num">8</span> Tooltip</div>
+  <div class="card-body">
+    <div class="grid grid-2">
+      <div style="padding:25px;text-align:center">
+        <div class="tooltip-wrap">
+          <button id="tooltipButton">Hover me</button>
+          <span id="tooltipText" class="tooltip-text">This is a tooltip!</span>
+        </div>
+      </div>
+      <div class="demo-note"><b>Demo Tooltip</b><br>• Hover vào button<br>• Tooltip xuất hiện<br>• Automation có thể dùng hover + kiểm tra visible</div>
+    </div>
+  </div>
+</section>
+
+<footer>Happy Testing! &nbsp;|&nbsp; Playwright &nbsp;•&nbsp; Selenium</footer>
+</main>
+</div>
+
+<div id="confirmModal" class="modal">
+  <div class="modal-box">
+    <h3 id="modalTitle">Confirm</h3>
+    <p id="modalMessage"></p>
+    <div class="row" style="justify-content:flex-end">
+      <button id="modalCancel" class="secondary">Cancel</button>
+      <button id="modalOk" class="success">OK</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+
+/* Alert / Confirm / Prompt */
+$("alertBtn").onclick=()=>{
+  const message="Hello! This is a browser Alert.";
+  $("alertOutput").textContent=message;
+  alert(message);
+};
+$("confirmBtn").onclick=()=>{
+  const message="Do you want to continue?";
+  $("alertOutput").textContent=message;
+  const result=confirm(message);
+  $("alertOutput").textContent=result?"Confirm result: OK":"Confirm result: Cancel";
+};
+$("promptBtn").onclick=()=>{
+  const message="Please enter your name:";
+  const result=prompt(message,"John");
+  $("alertOutput").textContent=result===null?"Prompt result: Cancel":"Prompt result: "+result;
+};
+
+/* Checkbox */
+function updateChecks(){
+  const checked=[...document.querySelectorAll('input[type=checkbox]')].filter(x=>x.checked);
+  $("checkStatus").textContent=checked.length?checked.map(x=>x.parentElement.textContent.trim()).join(", "):"No checkbox is checked";
+}
+document.querySelectorAll('input[type=checkbox]').forEach(x=>x.onchange=updateChecks);
+$("checkAll").onclick=()=>{document.querySelectorAll('input[type=checkbox]').forEach(x=>x.checked=true);updateChecks()};
+$("uncheckAll").onclick=()=>{document.querySelectorAll('input[type=checkbox]').forEach(x=>x.checked=false);updateChecks()};
+
+/* Radio */
+document.querySelectorAll('input[name=gender]').forEach(x=>x.onchange=()=>{
+  $("radioStatus").textContent=document.querySelector('input[name=gender]:checked').value;
+});
+
+/* Native select */
+$("nativeSelect").onchange=()=>{$("nativeStatus").textContent=$("nativeSelect").value||"No selection"};
+
+/* Custom dropdown */
+$("customSelect").onclick=()=>$("customOptions").classList.toggle("open");
+document.querySelectorAll(".custom-option").forEach(opt=>opt.onclick=()=>{
+  $("customSelect").firstChild.textContent=opt.dataset.value+" ";
+  $("customStatus").textContent=opt.dataset.value;
+  $("customOptions").classList.remove("open");
+});
+document.addEventListener("click",e=>{
+  if(!e.target.closest(".custom-wrap")) $("customOptions").classList.remove("open");
+});
+
+/* Table */
+function updateTable(){
+  const q=$("tableSearch").value.toLowerCase();
+  const rows=[...document.querySelectorAll("#dataTable tbody tr")];
+  let count=0;
+  rows.forEach(row=>{
+    const show=row.textContent.toLowerCase().includes(q);
+    row.style.display=show?"":"none"; if(show) count++;
+  });
+  $("rowCount").textContent=count;
+}
+$("tableSearch").oninput=updateTable;
+
+/* Upload */
+$("fileInput").onchange=()=>{
+  const file=$("fileInput").files[0];
+  if(!file)return;
+  $("fileName").textContent=`Selected: ${file.name} (${Math.ceil(file.size/1024)} KB)`;
+  $("uploadStatus").textContent="Uploading...";
+  $("progressBar").style.width="0%";
+  setTimeout(()=>{$("progressBar").style.width="100%"},150);
+  setTimeout(()=>{$("uploadStatus").textContent="Upload completed";},650);
+};
+
+/* Download */
+$("downloadBtn").onclick=()=>{
+  const content="This is a sample file for Web UI Testing Playground.\nPlaywright + Selenium";
+  const blob=new Blob([content],{type:"text/plain"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;a.download="sample-download.txt";a.click();
+  URL.revokeObjectURL(url);
+};
+
+/* Smooth navigation */
+document.querySelectorAll(".nav a").forEach(a=>a.onclick=()=>{
+  document.querySelectorAll(".nav a").forEach(x=>x.classList.remove("active"));
+  a.classList.add("active");
+});
+</script>
+</body>
+</html>
